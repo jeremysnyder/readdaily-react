@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import './App.css';
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import ArrowBack from '@material-ui/icons/ArrowBack';
-import ArrowForward from '@material-ui/icons/ArrowForward';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardActions from '@material-ui/core/CardActions';
-import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import React, { useState } from 'react'
+import './App.css'
+import { makeStyles } from '@material-ui/core/styles'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
+import Button from '@material-ui/core/Button'
+import IconButton from '@material-ui/core/IconButton'
+import ArrowBack from '@material-ui/icons/ArrowBack'
+import ArrowForward from '@material-ui/icons/ArrowForward'
+import Card from '@material-ui/core/Card'
+import CardHeader from '@material-ui/core/CardHeader'
+import CardActions from '@material-ui/core/CardActions'
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks'
+import MenuItem from '@material-ui/core/MenuItem'
+import FormControl from '@material-ui/core/FormControl'
+import Select from '@material-ui/core/Select'
 import { loadDay, loadPlanType } from './actions/data'
 import { connect } from 'react-redux'
 import moment from 'moment'
@@ -22,6 +22,7 @@ import moment from 'moment'
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
+    fontFamily: 'Helvetica Neue'
   },
   title: {
     textAlign: 'center',
@@ -31,19 +32,29 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     position: 'fixed',
     textAlign: 'center',
-    bottom: 82,
+    bottom: 0,
     backgroundColor: 'lightGray'
   },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
+  reading: {
+    margin: 10
   },
-}));
+  readingHeader: {
+    backgroundColor: 'lightgray',
+    padding: 8,
+    fontSize: '1.1rem',
+    textAlign: 'center'
+  },
+  readingBody: {
+    padding: 8,
+  }
+}))
 
 function Title(props) {
+  const classes = useStyles()
   return (
-    <div className={props.classes.title}>
+    <div className={classes.title}>
       <Typography variant="h5">
-        Read Daily
+        <span style={{ fontFamily: 'times new roman' }}>R</span>ead Daily
       </Typography>
       <Typography variant="subtitle2">
         {props.loadedDay.format('ddd, MMMM Do')}
@@ -53,13 +64,13 @@ function Title(props) {
 }
 
 function TitleBar(props) {
-  const { classes, loadedDay, changeDay } = props
+  const { loadedDay, changeDay } = props
   return (
     <Toolbar>
       <IconButton edge="start" color="inherit" aria-label="menu" onClick={() => changeDay(loadedDay.subtract(1, 'days'))}>
         <ArrowBack />
       </IconButton>
-      <Title classes={classes} loadedDay={loadedDay} />
+      <Title loadedDay={loadedDay} />
       <IconButton edge="end" color="inherit" aria-label="menu" onClick={() => changeDay(loadedDay.add(1, 'days'))}>
         <ArrowForward />
       </IconButton>
@@ -67,40 +78,53 @@ function TitleBar(props) {
   )
 }
 
-function Reading(props) {
-  const { title, reading } = props
-  const headerStyle = {
-    backgroundColor: 'lightgray',
-    padding: 8,
-    fontSize: '1.1rem',
-    fontWeight: 'bold',
-    textAlign: 'center'
-  }
+function NoReading(props) {
+  const classes = useStyles()
   return (
-    <Card style={{ margin: 10 }}>
-      <CardHeader title={title} disableTypography={true} style={headerStyle} />
-      <CardActions style={{ padding: 8, fontWeight: 'bold' }}>
+    <Card className={classes.reading}>
+      <CardHeader title='No readings today' disableTypography={true} className={classes.readingHeader} />
+    </Card>
+  )
+}
+
+function Reading(props) {
+  const classes = useStyles()
+  const { title, reading } = props
+  return (
+    <Card className={classes.reading}>
+      <CardHeader title={title} disableTypography={true} className={classes.readingHeader} />
+      <CardActions className={classes.readingBody}>
         {reading}
-        <Button
-          variant="contained"
-          color="default"
-          startIcon={<LibraryBooksIcon />}
-          style={{ marginLeft: 'auto' }}
-        >
-          Read
-        </Button>
+        <ReadButton passage={reading} />
       </CardActions>
     </Card>
   )
 }
 
+function ReadButton(props) {
+  const { passage } = props
+  const openReading = () => window.open(`http://esv.org/${window.encodeURIComponent(passage)}/`, '_blank')
+  return <Button
+    variant="contained"
+    color="default"
+    startIcon={<LibraryBooksIcon />}
+    style={{ marginLeft: 'auto' }}
+    onClick={openReading}
+  >
+    Read
+</Button>
+}
+
 function ReadingList(props) {
   const { readings } = props
-  return readings.map(x => <Reading key={x.title} title={x.title} reading={x.reading} />)
+  return readings && readings.length
+    ? readings.map(x => <Reading key={x.title} title={x.title} reading={x.reading} />)
+    : <NoReading />
 }
 
 function BottomBar(props) {
-  const { classes, plan, updatePlanTimeframe } = props
+  const { plan, updatePlanTimeframe } = props
+  const classes = useStyles()
   const planTimeframeOptions = {
     '1': 'All In 1 Year',
     '2:1': '2yr Plan - Year 1',
@@ -124,6 +148,7 @@ function BottomBar(props) {
 }
 
 const loadReadings = (readingFormat, readingData) => {
+  if (!readingData) return null
   const toReading = (title, reading) => ({ title, reading })
   const readings = []
   switch (readingFormat) {
@@ -138,7 +163,7 @@ const loadReadings = (readingFormat, readingData) => {
       if (readingData.ot2Reading) readings.push(toReading('Old Testament', readingData.ot2Reading))
       break
     default:
-      break;
+      break
   }
 
   if (readingData.psalmsReading) readings.push(toReading('Psalms', readingData.psalmsReading))
@@ -168,10 +193,10 @@ function App(props) {
   return (
     <div className={classes.root}>
       <AppBar position="static">
-        <TitleBar classes={classes} loadedDay={loadedDay} changeDay={changeDay} />
+        <TitleBar loadedDay={loadedDay} changeDay={changeDay} />
       </AppBar>
       <ReadingList readings={readings} />
-      <BottomBar classes={classes} plan={planTimeframe} updatePlanTimeframe={loadPlanType} />
+      <BottomBar plan={planTimeframe} updatePlanTimeframe={loadPlanType} />
     </div>
   )
 }
