@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import './App.css'
 import { makeStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -33,7 +32,14 @@ const useStyles = makeStyles(theme => ({
     position: 'fixed',
     textAlign: 'center',
     bottom: 0,
-    backgroundColor: 'lightGray'
+    backgroundColor: 'lightGray',
+    boxShadow: '0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)'
+  },
+  bottomBarSelect: {
+    marginBottom: 30,
+    marginTop: 15,
+    fontWeight: 'bold',
+    fontSize: '1.2rem'
   },
   reading: {
     margin: 10
@@ -41,11 +47,12 @@ const useStyles = makeStyles(theme => ({
   readingHeader: {
     backgroundColor: 'lightgray',
     padding: 8,
-    fontSize: '1.1rem',
+    fontSize: '1.5rem',
     textAlign: 'center'
   },
   readingBody: {
     padding: 8,
+    fontSize: '1.3rem',
   }
 }))
 
@@ -54,10 +61,10 @@ function Title(props) {
   return (
     <div className={classes.title}>
       <Typography variant="h5">
-        <span style={{ fontFamily: 'times new roman' }}>R</span>ead Daily
+        {props.loadedDay.format('ddd, MMMM Do')}
       </Typography>
       <Typography variant="subtitle2">
-        {props.loadedDay.format('ddd, MMMM Do')}
+        Read Daily
       </Typography>
     </div>
   )
@@ -133,11 +140,11 @@ function BottomBar(props) {
 
   return (
     <div className={classes.bottomBar}>
-      <FormControl style={{ width: 200 }}>
+      <FormControl>
         <Select
           value={plan}
           onChange={event => updatePlanTimeframe(event.target.value)}
-          style={{ marginBottom: 15, marginTop: 15 }}
+          className={classes.bottomBarSelect}
         >
           <MenuItem value="" disabled>Reading Plan</MenuItem>
           {Object.keys(planTimeframeOptions).map(x => <MenuItem key={x} value={x}>{planTimeframeOptions[x]}</MenuItem>)}
