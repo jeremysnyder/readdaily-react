@@ -14,18 +14,20 @@ const readingDay = value => {
 export const loadDay = date => dispatch => {
   const action = payload => dispatch({ type: 'LOAD_DAY', payload })
   const day = readingDay(date)
-  fetch(`./data/chapter-bible-reading-plan/${day}.json`).then(response => {
-    switch (response.status) {
-      case 200:
-        response.json()
-          .then(data => action(data))
-          .catch(e => action({}))
-        break
-      default:
-        console.log('Looks like there was a problem. Status Code: ' + response.status)
-        action({})
-    }
-  })
+  if (day) {
+    fetch(`./data/chapter-bible-reading-plan/${day}.json`).then(response => {
+      switch (response.status) {
+        case 200:
+          response.json()
+            .then(data => action(data))
+            .catch(e => action({}))
+          break
+        default:
+          console.log('Looks like there was a problem. Status Code: ' + response.status)
+          action({})
+      }
+    })
+  } else action({})
 }
 
 export const loadPlanType = payload => dispatch => {

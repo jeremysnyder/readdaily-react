@@ -108,24 +108,46 @@ function Reading(props) {
   )
 }
 
+const openReading = passages => {
+  const url = `http://esv.org/${passages.map(x => window.encodeURIComponent(x.reading)).join(';')}/`
+  window.open(url, '_blank')
+}
+
 function ReadButton(props) {
   const { passage } = props
-  const openReading = () => window.open(`http://esv.org/${window.encodeURIComponent(passage)}/`, '_blank')
   return <Button
     variant="contained"
     color="default"
     startIcon={<LibraryBooksIcon />}
     style={{ marginLeft: 'auto' }}
-    onClick={openReading}
+    onClick={openReading.bind(null, [passage])}
   >
     Read
-</Button>
+  </Button>
+}
+
+function ReadAllSection(props) {
+  const { readings } = props
+  return <div style={{ textAlign: 'center', marginTop: 20 }}>
+    <Button
+      variant="contained"
+      color="default"
+      startIcon={<LibraryBooksIcon />}
+
+      onClick={openReading.bind(null, readings)}
+    >
+      Read All Passages
+  </Button>
+  </div>
 }
 
 function ReadingList(props) {
   const { readings } = props
   return readings && readings.length
-    ? readings.map(x => <Reading key={x.title} title={x.title} reading={x.reading} />)
+    ? <div>
+      {readings.map(x => <Reading key={x.title} title={x.title} reading={x.reading} />)}
+      <ReadAllSection readings={readings} />
+    </div>
     : <NoReading />
 }
 
