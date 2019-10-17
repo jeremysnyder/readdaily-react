@@ -1,6 +1,7 @@
 import React from 'react'
 import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
+import CardContent from '@material-ui/core/CardContent'
 import CardActions from '@material-ui/core/CardActions'
 import Button from '@material-ui/core/Button'
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks'
@@ -14,6 +15,9 @@ function NoReading(props) {
   return (
     <Card className='reading'>
       <CardHeader title='No readings today' disableTypography={true} className='reading-header' />
+      <CardContent className='reading-body'>
+        Consider meditating on today's sermon text(s), or catching up on last week's readings...
+      </CardContent>
     </Card>
   )
 }

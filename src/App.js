@@ -1,47 +1,21 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import AppBar from '@material-ui/core/AppBar'
-import { loadDay, loadPlanType } from './actions/data'
 import moment from 'moment'
 
+import { loadDay, loadPlanType } from './actions/data'
 import { TitleBar } from './components/TitleBar'
-import { ReadingList } from './components/ReadingSection'
-import { BottomBar } from './components/BottomBar'
+import { Readings } from './components/Readings'
+import { Info } from './components/Info'
 
 import './App.css'
 
 
-const loadReadings = (readingFormat, readingData) => {
-  if (!readingData) return null
-  const toReading = (title, reading) => ({ title, reading })
-  const readings = []
-  switch (readingFormat) {
-    case '1':
-      if (readingData.otReading) readings.push(toReading('Old Testament 1', readingData.otReading))
-      if (readingData.ot2Reading) readings.push(toReading('Old Testament 2', readingData.ot2Reading))
-      break
-    case '2:1':
-      if (readingData.otReading) readings.push(toReading('Old Testament', readingData.otReading))
-      break
-    case '2:2':
-      if (readingData.ot2Reading) readings.push(toReading('Old Testament', readingData.ot2Reading))
-      break
-    default:
-      break
-  }
-
-  if (readingData.psalmsReading) readings.push(toReading('Psalms', readingData.psalmsReading))
-  if (readingData.gapReading) readings.push(toReading('Gospels/Acts/Proverbs', readingData.gapReading))
-  if (readingData.letterReading) readings.push(toReading('Letters', readingData.letterReading))
-
-  return readings
-}
-
 function App(props) {
   const { data, loadDay, loadPlanType, planTimeframe } = props
   const [dayChanged, setDayChanged] = useState(true)
+  const [showConfig, setShowConfig] = useState(false)
   const [loadedDay, setLoadedDay] = useState(moment())
-  const readings = loadReadings(planTimeframe, data)
   if (dayChanged) {
     loadDay(loadedDay)
     loadPlanType(localStorage.getItem('readDaily-planType') || '1')
@@ -56,10 +30,14 @@ function App(props) {
   return (
     <div className='app'>
       <AppBar position="static">
-        <TitleBar loadedDay={loadedDay} changeDay={changeDay} />
+        <TitleBar loadedDay={loadedDay} changeDay={changeDay} showConfig={showConfig} onInfoClick={() => setShowConfig(true)} onInfoClose={() => setShowConfig(false)} />
       </AppBar>
-      <ReadingList readings={readings} />
-      <BottomBar plan={planTimeframe} updatePlanTimeframe={loadPlanType} />
+      {
+        showConfig
+          ? <Info />
+          : <Readings data={data} loadPlanType={loadPlanType} planTimeframe={planTimeframe} />
+      }
+
     </div>
   )
 }
